@@ -15,9 +15,15 @@ type GoModule struct {
 	version string
 }
 
-func Parse(path string, version string) (GoModule, error) {
-	split := strings.Split(path, string(os.PathSeparator))
+func Parse(project string, version string) (GoModule, error) {
+	if project == "" {
+		return GoModule{}, fmt.Errorf("project name is empty")
+	}
+	if version == "" {
+		return GoModule{}, fmt.Errorf("version is empty")
+	}
 
+	split := strings.Split(project, string(os.PathSeparator))
 	if len(split) != pathLength {
 		return GoModule{}, fmt.Errorf("Path supplied is incorrect number of tokens")
 	}
