@@ -1,9 +1,9 @@
 package packager
 
 import (
-	"archive/zip"
 	"fmt"
-	"gopackager/gomodule"
+	"gopackager/packager/compress"
+	"gopackager/packager/gomodule"
 	"io"
 	"os"
 	"path/filepath"
@@ -37,11 +37,8 @@ func contains(path string, files ...string) bool {
 	return false
 }
 
-func Package(sourcePath string, goModule gomodule.GoModule, destinationPath string) {
-	if !contains(sourcePath, "go.mod") {
-		fmt.Println("Not all files are present")
-		os.Exit(1)
-	}
+func Package(goModule gomodule.GoModule, sourcePath string, destinationPath string) {
+	validateProject(sourcePath)
 
 	//TODO If the directories already exist, fail
 
@@ -51,47 +48,17 @@ func Package(sourcePath string, goModule gomodule.GoModule, destinationPath stri
 	fullPathToTempProject := createTemporaryFolder(goModule.GetProjectPath())
 
 	copyProject(sourcePath, fullPathToTempProject)
-	compressProject(
+	compress.Folder(
 		os.TempDir()+goModule.GetVcs(),
 		destinationPath+string(os.PathSeparator)+goModule.GetModuleZipName(),
 	)
 }
 
-func compressProject(folderToZip string, projectZipName string) {
-	newZipFile, err := os.Create(projectZipName)
-	if err != nil {
-		panic(err)
+func validateProject(sourcePath string) {
+	if !contains(sourcePath, "go.mod") {
+		fmt.Println("Not all files are present")
+		os.Exit(1)
 	}
-
-	writer := zip.NewWriter(newZipFile)
-	defer writer.Close()
-
-	_ = filepath.Walk(folderToZip, func(path string, info os.FileInfo, err error) error {
-		if !info.IsDir() {
-			addFileToZip(writer, path)
-		}
-		return nil
-	})
-}
-
-func addFileToZip(writer *zip.Writer, file string) error {
-	openedFile, err := os.Open(file)
-	if err != nil {
-		return fmt.Errorf("unable to open file %v: %v", file, err)
-	}
-	defer openedFile.Close()
-
-	// Strip the temp folder names
-	fileToCreate := strings.Replace(file, os.TempDir(), "", 1)
-	wr, err := writer.Create(fileToCreate)
-	if err != nil {
-		return fmt.Errorf("error adding file; '%s' to zip : %s", file, err)
-	}
-
-	if _, err := io.Copy(wr, openedFile); err != nil {
-		return fmt.Errorf("error writing %s to zip: %s", file, err)
-	}
-	return nil
 }
 
 func createTemporaryFolder(path string) string {
