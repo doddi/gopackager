@@ -3,6 +3,7 @@ package packager
 import (
 	"archive/zip"
 	"fmt"
+	"gopackager/gomodule"
 	"io"
 	"os"
 	"path/filepath"
@@ -13,7 +14,7 @@ func contains(path string, files ...string) bool {
 
 	found := 0
 
-	filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		// already found what we need, skip
 		if found >= len(files) {
 			return nil
@@ -36,7 +37,7 @@ func contains(path string, files ...string) bool {
 	return false
 }
 
-func Package(sourcePath string, projectName string, projectVersion string, destinationPath string) {
+func Package(sourcePath string, goModule gomodule.GoModule, destinationPath string) {
 	if !contains(sourcePath, "go.mod") {
 		fmt.Println("Not all files are present")
 		os.Exit(1)
@@ -44,22 +45,19 @@ func Package(sourcePath string, projectName string, projectVersion string, desti
 
 	//TODO If the directories already exist, fail
 
-	project := projectName + "@" + projectVersion
+	defer removeTempFolder(goModule.GetProjectPath())
 
-	defer removeTempFolder(project)
-
-	// Create temp folder to contain project to copy
-	fullPathToTempProject := createTemporaryFolder(project)
+	// Create temp folder to contain temporary copy of project
+	fullPathToTempProject := createTemporaryFolder(goModule.GetProjectPath())
 
 	copyProject(sourcePath, fullPathToTempProject)
-
-	split := strings.Split(projectName, string(os.PathSeparator))
-	projectZipName := split[len(split)-1] + ".zip"
-	folderToZip := os.TempDir() + split[0]
-	compressProject(project, folderToZip, projectZipName)
+	compressProject(
+		os.TempDir()+goModule.GetVcs(),
+		destinationPath+string(os.PathSeparator)+goModule.GetModuleZipName(),
+	)
 }
 
-func compressProject(projectName string, folderToZip string, projectZipName string) {
+func compressProject(folderToZip string, projectZipName string) {
 	newZipFile, err := os.Create(projectZipName)
 	if err != nil {
 		panic(err)
@@ -68,7 +66,7 @@ func compressProject(projectName string, folderToZip string, projectZipName stri
 	writer := zip.NewWriter(newZipFile)
 	defer writer.Close()
 
-	filepath.Walk(folderToZip, func(path string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(folderToZip, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			addFileToZip(writer, path)
 		}

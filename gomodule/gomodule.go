@@ -1,4 +1,4 @@
-package packager
+package gomodule
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ type GoModule struct {
 	version string
 }
 
-func (goModule GoModule) Parse(path string, version string) (GoModule, error) {
+func Parse(path string, version string) (GoModule, error) {
 	split := strings.Split(path, string(os.PathSeparator))
 
 	if len(split) != pathLength {
@@ -32,6 +32,14 @@ func (goModule GoModule) Parse(path string, version string) (GoModule, error) {
 	return module, nil
 }
 
+func (goModule GoModule) GetVcs() string {
+	return goModule.vcs
+}
+
 func (goModule GoModule) GetModuleZipName() string {
 	return goModule.name + "@" + goModule.version + ".zip"
+}
+
+func (goModule GoModule) GetProjectPath() string {
+	return fmt.Sprintf("%s/%s/%s", goModule.vcs, goModule.owner, goModule.name)
 }

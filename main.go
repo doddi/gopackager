@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"gopackager/gomodule"
 	"gopackager/packager"
 	"os"
 )
@@ -16,8 +17,14 @@ func main() {
 	}
 
 	sourcePath := "."
-	projectName := "github.com/doddi/gopackager"
-	projectVersion := "1.0.0"
+	//projectName := "github.com/doddi/gopackager"
+	//projectVersion := "1.0.0"
 	destinationPath := "."
-	packager.Package(sourcePath, projectName, projectVersion, destinationPath)
+
+	goModule, err := gomodule.Parse("github.com/doddi/gopackager", "v0.0.1")
+	if err != nil {
+		panic("Unable to parse go module name provided")
+	}
+
+	packager.Package(sourcePath, goModule, destinationPath)
 }
