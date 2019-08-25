@@ -1,4 +1,4 @@
-#gopackager
+# gopackager
 
 Command line tool that will package a project to allow serving as a gomodule (see below)
 
