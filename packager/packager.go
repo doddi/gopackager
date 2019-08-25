@@ -72,12 +72,13 @@ func createTemporaryFolder(path string) string {
 
 func copyProject(sourcePath string, destinationPath string) {
 	filepath.Walk(sourcePath, func(path string, info os.FileInfo, err error) error {
-		dest := destinationPath + string(os.PathSeparator) + path
+		dst := destinationPath + string(os.PathSeparator) + path
+		src := sourcePath + string(os.PathSeparator) + path
 		if info.IsDir() {
-			os.Mkdir(dest, os.ModeDir|os.ModePerm)
+			os.Mkdir(dst, os.ModeDir|os.ModePerm)
 			return nil
 		}
-		copyFile(sourcePath, dest)
+		copyFile(src, dst)
 		return nil
 	})
 }
