@@ -49,7 +49,7 @@ func Package(goModule gomodule.GoModule, sourcePath string, destinationPath stri
 
 	copyProject(sourcePath, fullPathToTempProject)
 	compress.Folder(
-		os.TempDir()+goModule.GetVcs(),
+		os.TempDir()+string(os.PathSeparator)+goModule.GetVcs(),
 		destinationPath+string(os.PathSeparator)+goModule.GetModuleZipName(),
 	)
 }
@@ -62,7 +62,7 @@ func validateProject(sourcePath string) {
 }
 
 func createTemporaryFolder(path string) string {
-	absoluteDestination := os.TempDir() + path
+	absoluteDestination := os.TempDir() + string(os.PathSeparator) + path
 	err := os.MkdirAll(absoluteDestination, os.ModeDir|os.ModePerm)
 	if err != nil {
 		panic(err)
