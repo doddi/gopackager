@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/doddi/gopackager.svg?style=svg)](https://circleci.com/gh/doddi/gopackager)
+
 # gopackager
 
 Command line tool that will package a project to allow serving as a gomodule (see below)
