@@ -2,8 +2,8 @@ package main
 
 import (
 	"flag"
-	"gopackager/packager"
-	"gopackager/packager/gomodule"
+	"github.com/doddi/gopackager/packager"
+	"github.com/doddi/gopackager/packager/gomodule"
 )
 
 func main() {

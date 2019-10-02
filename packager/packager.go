@@ -2,8 +2,8 @@ package packager
 
 import (
 	"fmt"
-	"gopackager/packager/compress"
-	"gopackager/packager/gomodule"
+	"github.com/doddi/gopackager/packager/compress"
+	"github.com/doddi/gopackager/packager/gomodule"
 	"io"
 	"os"
 	"path/filepath"
