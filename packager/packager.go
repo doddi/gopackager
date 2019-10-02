@@ -56,7 +56,7 @@ func Package(goModule gomodule.GoModule, sourcePath string, destinationPath stri
 
 func validateProject(sourcePath string) {
 	if !contains(sourcePath, "go.mod") {
-		fmt.Println("Not all files are present")
+		fmt.Println("Failed to find project's go.mod file")
 		os.Exit(1)
 	}
 }
