@@ -21,7 +21,7 @@ func contains(path string, files ...string) bool {
 		}
 
 		for _, file := range files {
-			if path == file {
+			if info.Name() == file {
 				found++
 				if found >= len(files) {
 					break
@@ -71,14 +71,14 @@ func createTemporaryFolder(path string) string {
 }
 
 func copyProject(sourcePath string, destinationPath string) {
-	filepath.Walk(sourcePath, func(path string, info os.FileInfo, err error) error {
-		dst := destinationPath + string(os.PathSeparator) + path
-		src := sourcePath + string(os.PathSeparator) + path
+	filepath.Walk(sourcePath, func(fullSourcePath string, info os.FileInfo, err error) error {
+		path := strings.Replace(fullSourcePath, sourcePath, "", -1)
+		fullDestPath := destinationPath + string(os.PathSeparator) + path
 		if info.IsDir() {
-			os.Mkdir(dst, os.ModeDir|os.ModePerm)
+			os.Mkdir(fullDestPath, os.ModeDir|os.ModePerm)
 			return nil
 		}
-		copyFile(src, dst)
+		copyFile(fullSourcePath, fullDestPath)
 		return nil
 	})
 }
