@@ -62,7 +62,7 @@ func validateProject(sourcePath string) {
 }
 
 func createTemporaryFolder(path string) string {
-	absoluteDestination := os.TempDir() + string(os.PathSeparator) + path
+	absoluteDestination := os.TempDir() + string(os.PathSeparator) + path + string(os.PathSeparator) + "@v"
 	err := os.MkdirAll(absoluteDestination, os.ModeDir|os.ModePerm)
 	if err != nil {
 		panic(err)
